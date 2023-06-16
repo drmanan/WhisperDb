@@ -13,4 +13,17 @@ public class Hash {
 
     private static String[] cubes = {"0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"};
 
+    public Hash(String path, CipherManager cipherManager) {
+        this.path = path;
+        this.cipherManager = cipherManager;
+    }
+
+    public void storeObject(Object key, Object value){
+        // TODO
+    }
+
+    public void storeObject(Object key, Object value, Boolean update){
+        // TODO
+    }
+
 }
