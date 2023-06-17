@@ -1,3 +1,11 @@
+/**
+ * <H2> Hash </H2>
+ *
+ * @author Manan Sharma
+ * @version 1
+ * @since Saturday, 17 of June, 2023; 06:17:14
+ */
+
 package io.github.drmanan.whisper.collision;
 
 public class Hash {

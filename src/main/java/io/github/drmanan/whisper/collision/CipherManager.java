@@ -1,3 +1,11 @@
+/**
+ * <H2> CipherManager </H2>
+ *
+ * @author Manan Sharma
+ * @version 1
+ * @since Saturday, 17 of June, 2023; 05:48:16
+ */
+
 package io.github.drmanan.whisper.collision;
 
 import javax.crypto.Cipher;
