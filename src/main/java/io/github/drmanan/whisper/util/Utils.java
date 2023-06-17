@@ -54,16 +54,18 @@ public class Utils {
     * <H3> recursiveDelete </H3>
     * <p>
     * >> Commons-io or jdk.jpackage.internal.IOUtils or my own, to reduce the size and remove commons-io
+    * <br>
     * >> jdk.jpackage.internal.IOUtils.deleteRecursive returns void, may need acknowledgement of deletion
     * </p>
+    *
     * @param path path of <b>file and/or directory</b> to be <b><i>Deleted, recursively</i></b>
     *
     * @return boolean True on successful deletion
     *
     * @throws FileNotFoundException
-    * Throes FileNotFound if the path is incorrect.
+    * Throws FileNotFound if the path is incorrect.
     *
-    * @see jdk.jpackage.internal.IOUtils.deleteRecursive
+    * @see jdk.jpackage.internal.IOUtils.deleteRecursive(Path directory) throws IOException
     *
     */
 
@@ -76,5 +78,17 @@ public class Utils {
             }
         }
         return ret && path.delete();
+    }
+
+    public static boolean checkForCryptoAvailable() {
+        try {
+//			Security.addProvider(new BouncyCastleProvider());
+//            for(String s : Security.getAlgorithms("Cipher"))
+//                 System.out.println(s);
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CipherManager.key_algorithm);
+            return true;
+        } catch (NoSuchAlgorithmException e) {
+            return false;
+        }
     }
 }
