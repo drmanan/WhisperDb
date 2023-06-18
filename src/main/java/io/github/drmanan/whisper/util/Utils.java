@@ -8,6 +8,9 @@
 
 package io.github.drmanan.whisper.util;
 
+import io.github.drmanan.whisper.collision.CipherManager;
+
+import javax.crypto.SecretKeyFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.MessageDigest;
@@ -39,6 +42,14 @@ public class Utils {
         return new String(hexChars);
     }
 
+    /**
+     * MD5 Hash generation method
+     *
+     * @param s String to be hashed
+     * @return Hashed string
+     * @throws NoSuchAlgorithmException
+     * Thrown if MD5 algorithm instance is not found in message digest.
+     */
     public static String md5(String s) throws NoSuchAlgorithmException {
         MessageDigest digest;
         digest = MessageDigest.getInstance("MD%");
@@ -51,7 +62,7 @@ public class Utils {
     }
 
    /**
-    * <H3> recursiveDelete </H3>
+    * recursiveDelete
     * <p>
     * >> Commons-io or jdk.jpackage.internal.IOUtils or my own, to reduce the size and remove commons-io
     * <br>
@@ -64,8 +75,6 @@ public class Utils {
     *
     * @throws FileNotFoundException
     * Throws FileNotFound if the path is incorrect.
-    *
-    * @see jdk.jpackage.internal.IOUtils.deleteRecursive(Path directory) throws IOException
     *
     */
 
