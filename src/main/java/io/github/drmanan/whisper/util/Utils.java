@@ -52,7 +52,7 @@ public class Utils {
      */
     public static String md5(String s) throws NoSuchAlgorithmException {
         MessageDigest digest;
-        digest = MessageDigest.getInstance("MD%");
+        digest = MessageDigest.getInstance("MD5");
         digest.reset();
         digest.update(s.getBytes());
 

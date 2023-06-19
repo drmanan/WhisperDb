@@ -1,7 +1,6 @@
 package io.github.drmanan.whisper;
 
 import io.github.drmanan.whisper.collision.CipherManager;
-import io.github.drmanan.whisper.collision.Hash;
 import io.github.drmanan.whisper.util.Utils;
 
 import java.io.File;
@@ -20,22 +19,16 @@ public class WhisperDb {
         // None
     }
 
-    /**
-     * Open/create a WaspHash instance
-     * @param hashName name
-     * @return
-     */
-    public Hash openOrCreateHash(String hashName) {
-        Hash hash;
+    public WhisperHash openOrCreateHash(String hashName) {
+        WhisperHash hash;
         try {
-            if(existsHash(hashName)) {
+            if (existsHash(hashName)) {
                 hash = getHash(hashName);
             } else {
                 hash = createHash(hashName);
             }
             return hash;
-        }
-        catch(Exception wfe) {
+        } catch (Exception wfe) {
             wfe.printStackTrace();
             return null;
         }
@@ -44,23 +37,21 @@ public class WhisperDb {
     public boolean existsHash(String hashName) {
         try {
             String realname = Utils.md5(hashName);
-            String directory = path+"/"+Utils.md5(dbName)+"/"+realname;
+            String directory = path + "/" + Utils.md5(dbName) + "/" + realname;
             return new File(directory).exists();
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
-    protected Hash getHash(String hashName) {
+    protected WhisperHash getHash(String hashName) {
         try {
             String realname = Utils.md5(hashName);
-            String directory = path+"/"+Utils.md5(dbName)+"/"+realname;
-            if(new File(directory).exists()) { // already exists
-                Hash hash = new Hash(directory, cipherManager);
+            String directory = path + "/" + Utils.md5(dbName) + "/" + realname;
+            if (new File(directory).exists()) { // already exists
+                WhisperHash hash = new WhisperHash(cipherManager, directory);
                 return hash;
-            }
-            else {
+            } else {
                 return null;
             }
 
@@ -70,27 +61,26 @@ public class WhisperDb {
         }
     }
 
-    protected Hash createHash(String hashName) {
+    protected WhisperHash createHash(String hashName) {
         try {
             String realname = Utils.md5(hashName);
-            String directory = path+"/"+Utils.md5(dbName)+"/"+realname;
-            if(!new File(directory).exists()) { // if not exists
+            String directory = path + "/" + Utils.md5(dbName) + "/" + realname;
+            if (!new File(directory).exists()) { // if not exists
                 // create a new one
-                if(new File(directory).mkdir()) {
-                    Hash hash = new Hash(directory,cipherManager);
+                if (new File(directory).mkdir()) {
+                    WhisperHash hash = new WhisperHash(cipherManager, directory);
 
-                    if(hashes==null) hashes = new ArrayList<String>();
+                    if (hashes == null) hashes = new ArrayList<String>();
                     hashes.add(hashName);
                     persist(); // update db data on disk
                     return hash;
-                }
-                else {
+                } else {
                     return null;
                 }
             } else {
                 return getHash(hashName);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -99,24 +89,23 @@ public class WhisperDb {
     public boolean removeHash(String hashName) {
         try {
             String realname = Utils.md5(hashName);
-            String directory = path+"/"+Utils.md5(dbName)+"/"+realname;
-            if(new File(directory).exists()) { // if exists
+            String directory = path + "/" + Utils.md5(dbName) + "/" + realname;
+            if (new File(directory).exists()) { // if exists
                 // delete recursively
                 try {
                     Utils.recursiveDelete(new File(directory));
 
-                    if(hashes!=null) hashes.remove(hashName);
+                    if (hashes != null) hashes.remove(hashName);
                     persist(); // update db data on disk
 
                     return true;
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     return false;
                 }
             } else {
                 return false;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -160,8 +149,7 @@ public class WhisperDb {
 
     @Override
     public String toString() {
-        return "WaspDb [name=" + dbName + ", path=" + path + ", cipher enabled = "
-                + (cipherManager!=null) + "]";
+        return "WaspDb [name=" + dbName + ", path=" + path + ", cipher enabled = " + (cipherManager != null) + "]";
     }
 
 }

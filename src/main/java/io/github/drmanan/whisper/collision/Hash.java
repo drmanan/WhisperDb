@@ -16,18 +16,20 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static io.github.drmanan.whisper.util.Utils.recursiveDelete;
 
 public class Hash {
 
+    private static final String[] cubes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
     protected static int MAXFILESIZE = 65536;
     private static String TAG;
-    private static final String[] cubes = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
+    private final CipherManager cipherManager;
     protected String path;
     protected String ext = ".cube";
-    private final CipherManager cipherManager;
 
     public Hash(String path, CipherManager cipherManager) {
         this.path = path;
@@ -75,7 +77,6 @@ public class Hash {
     }
 
     public String getSearchKey(Object key) throws NoSuchAlgorithmException {
-        // transform a key to a searchKey for the collision!
         final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
         messageDigest.reset();
         messageDigest.update(KryoStoreUtils.serialize(key));
@@ -94,7 +95,7 @@ public class Hash {
             if (returning != null) {
                 if (remove) {
                     hash.remove(key);
-                    storeHashByKey(hash, searchKey); 
+                    storeHashByKey(hash, searchKey);
                 }
             } else {
                 throw new KeyNotFoundException("key not found for key " + key);
@@ -122,7 +123,6 @@ public class Hash {
         }
     }
 
-    // always return a not-full hash from a searchKey
     public HashMap getHashFromKey(String searchKey) throws Exception {
         HashMap hash;
         String file = getFileFromSearchKey(searchKey);
@@ -136,7 +136,6 @@ public class Hash {
                 return getHashFromKey(searchKey);
             }
         }
-        // return
         return hash;
     }
 
@@ -162,11 +161,69 @@ public class Hash {
         } catch (Exception e) {
             e.printStackTrace();
             recursiveDelete(newdir);
-            // and restore original cube
             success = file2.renameTo(file1);
             if (success) {
                 throw new Exception("Unable to add more data - no more space left?");
             } else throw new Exception("FATAL ON FILESYSTEM DURING ADDING MORE DATA - possible corrupted data!!!");
         }
+    }
+
+    public <T> List<T> getAllValues(String path) {
+        List<Object> returnable = new ArrayList<>();
+        for (String s : cubes) {
+            String currentPath = path + "/" + s;
+            if (new File(currentPath).isDirectory()) {
+                returnable.addAll(getAllValues(currentPath));
+            }
+            if (new File(currentPath + ext).exists()) {
+                HashMap data;
+                try {
+                    data = (HashMap) KryoStoreUtils.readFromDisk(currentPath + ext, HashMap.class, cipherManager);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                returnable.addAll(data.values());
+            }
+        }
+        return (List<T>) returnable;
+    }
+
+    public <T> List<T> getAllKeys(String path) {
+        List<Object> returnable = new ArrayList<Object>();
+
+        for (String s : cubes) {
+            String currentPath = path + "/" + s;
+            if (new File(currentPath).isDirectory()) {
+                returnable.addAll(getAllKeys(currentPath));
+            }
+            if (new File(currentPath + ext).exists()) {
+                HashMap data;
+                try {
+                    data = (HashMap) KryoStoreUtils.readFromDisk(currentPath + ext, HashMap.class, cipherManager);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                returnable.addAll(data.keySet());
+            }
+        }
+        return (List<T>) returnable;
+    }
+
+    public HashMap getAllData(String p) throws Exception {
+        if (p == null) p = path;
+        HashMap returnable = new HashMap();
+
+        for (String s : cubes) {
+            String currentPath = p + "/" + s;
+            if (new File(currentPath).isDirectory()) {
+                returnable.putAll(getAllData(currentPath));
+            }
+            if (new File(currentPath + ext).exists()) {
+                HashMap data;
+                data = (HashMap) KryoStoreUtils.readFromDisk(currentPath + ext, HashMap.class, cipherManager);
+                returnable.putAll(data);
+            }
+        }
+        return returnable;
     }
 }

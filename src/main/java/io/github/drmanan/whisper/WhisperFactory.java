@@ -12,9 +12,52 @@ public class WhisperFactory {
     private static final String DB_NAME = "data.db";
     private static final String SALT_NAME = "salt";
 
-    public static void openOrCreateDatabase(final String path, final String name, final String password,
-                                            final WhisperListener<WhisperDb> listener){
-        // TODO
+    public static WhisperDb openOrCreateDatabase(String path, String name, String password) {
+        if (WhisperFactory.existsDatabase(path, name)) {
+            return WhisperFactory.loadDatabase(path, name, password);
+        } else {
+            return WhisperFactory.createDatabase(path, name, password);
+        }
+    }
+
+    public static WhisperDb openOrCreateDatabase(final String path, final String name, final String password, final WhisperListener<WhisperDb> listener) {
+        WhisperDb db;
+        if (WhisperFactory.existsDatabase(path, name)) {
+            db = WhisperFactory.loadDatabase(path, name, password);
+        } else {
+            db = WhisperFactory.createDatabase(path, name, password);
+        }
+
+        if (db != null) {
+            listener.onDone(db);
+        } else {
+            listener.onError("error on openOrCreateDatabase");
+        }
+
+        return db;
+    }
+
+    protected static WhisperDb createDatabase(final String path, final String name, final String password) {
+        if (password != null && !Utils.checkForCryptoAvailable()) return null;
+        Salt salt = Utils.generateSalt();
+        WhisperDb db = new WhisperDb();
+        db.setName(name);
+        db.setPath(path);
+        try {
+            CipherManager cipherManager = null;
+            if (!Utils.isEmpty(password)) {
+                cipherManager = CipherManager.getInstance(password.toCharArray(), salt.getSalt());
+            }
+
+            if (storeDatabase(db, cipherManager)) {
+                KryoStoreUtils.serializeToDisk(salt, db.getPath() + "/" + db.getName() + "/" + SALT_NAME, null);
+                db.setCipherManager(cipherManager);
+                return db;
+            } else return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     protected static boolean existsDatabase(String path, String name) {
@@ -23,7 +66,7 @@ public class WhisperFactory {
             db.setPath(path);
             db.setName(name);
             String directory;
-            directory = db.getPath()+"/"+db.getName();
+            directory = db.getPath() + "/" + db.getName();
 
             return (new File(directory).exists());
         } catch (Exception e) {
@@ -31,33 +74,32 @@ public class WhisperFactory {
         }
     }
 
-    public static boolean destroyDatabase(WhisperDb db){
+    public static boolean destroyDatabase(WhisperDb db) {
         try {
-            String directory = db.getPath()+"/"+ Utils.md5(db.getName())+"/";
-            if(new File(directory).exists()) { // if exists
+            String directory = db.getPath() + "/" + Utils.md5(db.getName()) + "/";
+            if (new File(directory).exists()) { // if exists
                 // delete recursively
                 try {
                     Utils.recursiveDelete(new File(directory));
                     return true;
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     return false;
                 }
             } else {
                 return true;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    protected static boolean storeDatabase(WhisperDb db, CipherManager cipherManager)  {
+    protected static boolean storeDatabase(WhisperDb db, CipherManager cipherManager) {
         try {
-            String directory = db.getPath()+"/"+db.getName();
+            String directory = db.getPath() + "/" + db.getName();
             boolean success = true;
-            if(!(new File(directory).exists())) success = (new File(directory)).mkdir();
-            if(success) {
+            if (!(new File(directory).exists())) success = (new File(directory)).mkdir();
+            if (success) {
                 // do not store the cipherManager
                 db.clearCipherInformation();
                 KryoStoreUtils.serializeToDisk(db, db.getPath() + "/" + db.getName() + "/" + DB_NAME, cipherManager);
@@ -74,19 +116,18 @@ public class WhisperFactory {
     }
 
     protected static WhisperDb loadDatabase(final String path, final String name, final String password) {
-        if(password!=null && !Utils.checkForCryptoAvailable()) return null;
+        if (password != null && !Utils.checkForCryptoAvailable()) return null;
         CipherManager cipherManager = null;
         try {
             String realname = Utils.md5(name);
             WhisperDb db;
 
-            Salt salt = (Salt) KryoStoreUtils.readFromDisk(path + "/" + realname +"/"+SALT_NAME,Salt.class, null);
-            if(!Utils.isEmpty(password))
-                cipherManager = CipherManager.getInstance(password.toCharArray(),salt.getSalt());
-            db = (WhisperDb) KryoStoreUtils.readFromDisk(path + "/" + realname + "/" + DB_NAME, WhisperDb.class, cipherManager);
-
-            db.setPath(path); // refresh the path to the current one
-            db.setCipherManager(cipherManager); // set the password in the object
+            Salt salt = (Salt) KryoStoreUtils.readFromDisk(path + "\\" + realname + "\\" + SALT_NAME, Salt.class, null);
+            if (!Utils.isEmpty(password))
+                cipherManager = CipherManager.getInstance(password.toCharArray(), salt.getSalt());
+            db = (WhisperDb) KryoStoreUtils.readFromDisk(path + "\\" + realname + "\\" + DB_NAME, WhisperDb.class, cipherManager);
+            db.setPath(path);
+            db.setCipherManager(cipherManager);
             return db;
         } catch (Exception e) {
             e.printStackTrace();

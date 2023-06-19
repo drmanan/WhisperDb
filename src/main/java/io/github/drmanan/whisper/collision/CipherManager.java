@@ -24,9 +24,10 @@ import java.security.spec.KeySpec;
 
 public class CipherManager {
 
-    public static String cipher_algorithm = "AES/CBC/PKCS7PADDING";
+    public static String cipher_algorithm = "AES_128/CBC/NoPadding"; //"AES/CBC/PKCS7PADDING";
     public static String key_algorithm = "PBKDF2WithHmacSHA1";
     public static String secretKeyAlgorithm = "AES";
+
 
     protected Key key;
 
