@@ -42,7 +42,7 @@ public class Main {
             System.out.println(s);
         }
 
-        System.out.println("\n\nProviders\n");
+        System.out.println("\n\nProviders' services\n");
 
         for (Provider provider : Security.getProviders()) {
             for (Provider.Service service : provider.getServices()) {
