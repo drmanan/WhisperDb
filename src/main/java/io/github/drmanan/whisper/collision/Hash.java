@@ -88,13 +88,13 @@ public class Hash {
     private Object retrieveObject(Object key, boolean remove) throws Exception {
         Object returning = null;
         try {
-            String searchKey = getSearchKey(key); // calculate searchKey for file to store
-            HashMap hash = getHashFromKey(searchKey); // return the hash from the key - it's size is < MAXSIZE-1
+            String searchKey = getSearchKey(key);
+            HashMap hash = getHashFromKey(searchKey);
             returning = hash.get(key);
             if (returning != null) {
                 if (remove) {
                     hash.remove(key);
-                    storeHashByKey(hash, searchKey); // store  hash
+                    storeHashByKey(hash, searchKey); 
                 }
             } else {
                 throw new KeyNotFoundException("key not found for key " + key);
@@ -108,12 +108,12 @@ public class Hash {
 
     public void storeObject(Object key, Object value, Boolean update) throws Exception {
         try {
-            String searchKey = getSearchKey(key); // calculate searchKey for file to store
-            HashMap hash = getHashFromKey(searchKey); // return the hash from the key - it's size is < MAXSIZE-1
+            String searchKey = getSearchKey(key);
+            HashMap hash = getHashFromKey(searchKey);
 
             if (!hash.containsKey(key) || update) {
-                hash.put(key, value); // add value
-                storeHashByKey(hash, searchKey); // store hash
+                hash.put(key, value);
+                storeHashByKey(hash, searchKey);
             } else {
                 throw new KeyAlreadyExistsException("key already exists for value " + hash.get(key));
             }
@@ -126,18 +126,13 @@ public class Hash {
     public HashMap getHashFromKey(String searchKey) throws Exception {
         HashMap hash;
         String file = getFileFromSearchKey(searchKey);
-        // if file not exists, return a new hash (the file will be created on store)
         if (!new File(file).exists()) {
             hash = new HashMap();
         } else {
-            // if file exists, read the hash inside
             hash = (HashMap) KryoStoreUtils.readFromDisk(file, HashMap.class, cipherManager);
-            // if hash is full (maxsize) this file should "explode" to a new cube
             long size = FileUtils.sizeOf(new File(file));
-            //System.out.println("file # " + size);
             if (size > MAXFILESIZE && hash.size() > 1) {
                 explodeCube(file);
-                // then recall this method again (recursive) to use the next byte of the key and find the correct file
                 return getHashFromKey(searchKey);
             }
         }
