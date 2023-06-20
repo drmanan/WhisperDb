@@ -96,4 +96,8 @@ public class Utils {
             return false;
         }
     }
+
+    public static int getLineNumber() {
+        return Thread.currentThread().getStackTrace()[2].getLineNumber();
+    }
 }

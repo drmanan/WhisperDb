@@ -8,6 +8,8 @@ import io.github.drmanan.whisper.util.Utils;
 
 import java.io.File;
 
+import static io.github.drmanan.whisper.util.Utils.getLineNumber;
+
 public class WhisperFactory {
 
     private static final String DB_NAME = "data.db";
@@ -16,18 +18,18 @@ public class WhisperFactory {
     /**
      * Open/create a Db instance.
      *
-     * @param path     the path for the database folder - use Context.getFilesDir().getPath()
+     * @param path     the path for the database folder
      * @param name     name of the database
      * @param password password - set as null if you don't need encryption / for better performances
      * @return Database instance
      */
     public static WhisperDb openOrCreateDatabase(String path, String name, String password) {
-        Log.info("WhisperFactory: openOrCreateDatabase");
+        Log.info(getLineNumber() + "WhisperFactory: openOrCreateDatabase");
         if (WhisperFactory.existsDatabase(path, name)) {
-            Log.info("WhisperFactory: Db Exists");
+            Log.info(getLineNumber() + "WhisperFactory: Db Exists");
             return WhisperFactory.loadDatabase(path, name, password);
         } else {
-            Log.info("WhisperFactory: Create new Db");
+            Log.info(getLineNumber() + "WhisperFactory: Create new Db");
             return WhisperFactory.createDatabase(path, name, password);
         }
     }
@@ -37,7 +39,7 @@ public class WhisperFactory {
      *
      * <p>The operation requires some time, according to device CPU power.</p>
      *
-     * @param path     the path for the database folder - use Context.getFilesDir().getPath()
+     * @param path     the path for the database folder
      * @param name     name of the database
      * @param password password - set as null if you don't need encryption / for better performances
      * @param listener a WaspListener instance, to get the database when is ready
@@ -64,7 +66,7 @@ public class WhisperFactory {
     protected static WhisperDb createDatabase(final String path, final String name, final String password) {
         Log.debug("WhisperFactory: CreateDb");
         if (password != null && !Utils.checkForCryptoAvailable()) {
-            Log.debug("WhisperFactory: password: " + password);
+            Log.debug(getLineNumber() + "WhisperFactory: password: " + password);
             return null;
         }
         Salt salt = Utils.generateSalt();
@@ -95,15 +97,17 @@ public class WhisperFactory {
     }
 
     protected static boolean existsDatabase(String path, String name) {
-        Log.info("WhisperFactory: existsDatabase");
+        Log.info(getLineNumber() + "WhisperFactory: existsDatabase");
         try {
             WhisperDb db = new WhisperDb();
             db.setPath(path);
             db.setName(name);
             String directory;
             directory = db.getPath() + "\\" + db.getName();
-            Log.info("WhisperFactory: existsDatabase: trying if Db Exists at " + directory);
-            return (new File(directory).exists());
+            Log.info(getLineNumber() + "WhisperFactory: existsDatabase: trying if Db Exists at " + directory);
+            boolean doesFileExist = new File(directory).exists();
+            Log.info(getLineNumber() + "WhisperFactory: existsDatabase: doesFileExist: " + doesFileExist);
+            return doesFileExist;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

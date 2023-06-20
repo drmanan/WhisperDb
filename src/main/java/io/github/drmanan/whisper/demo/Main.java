@@ -18,6 +18,8 @@ import io.github.drmanan.whisper.WhisperFactory;
 import io.github.drmanan.whisper.WhisperHash;
 import io.github.drmanan.whisper.demo.pojo.User;
 
+import static io.github.drmanan.whisper.util.Utils.getLineNumber;
+
 public class Main {
 
     // static Logger log = Logger.getLogger(Main.class.getName());
@@ -33,8 +35,8 @@ public class Main {
         String databaseName = "testDb";
         String password = "passw0rd";
 
-        Log.info("main: Db: " + databaseName);
-        Log.info("main: Password: " + password);
+        Log.info(getLineNumber() + " main: Db: " + databaseName);
+        Log.info(getLineNumber() + " main: Password: " + password);
 
         WhisperDb db = WhisperFactory.openOrCreateDatabase(path, databaseName, password);
 
