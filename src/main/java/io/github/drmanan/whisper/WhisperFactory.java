@@ -1,5 +1,6 @@
 package io.github.drmanan.whisper;
 
+import com.esotericsoftware.minlog.Log;
 import io.github.drmanan.whisper.collision.CipherManager;
 import io.github.drmanan.whisper.collision.KryoStoreUtils;
 import io.github.drmanan.whisper.util.Salt;
@@ -13,9 +14,12 @@ public class WhisperFactory {
     private static final String SALT_NAME = "salt";
 
     public static WhisperDb openOrCreateDatabase(String path, String name, String password) {
+        Log.info("WhisperFactory: openOrCreateDatabase");
         if (WhisperFactory.existsDatabase(path, name)) {
+            Log.info("WhisperFactory: Db Exists");
             return WhisperFactory.loadDatabase(path, name, password);
         } else {
+            Log.info("WhisperFactory: Create new Db");
             return WhisperFactory.createDatabase(path, name, password);
         }
     }
@@ -116,7 +120,14 @@ public class WhisperFactory {
     }
 
     protected static WhisperDb loadDatabase(final String path, final String name, final String password) {
-        if (password != null && !Utils.checkForCryptoAvailable()) return null;
+        Log.info("WhisperFactory: Load Db");
+        if (password != null && !Utils.checkForCryptoAvailable()) {
+            if (password == null) {
+                Log.info("WhisperFactory: Load Db Password is null");
+            }
+
+            return null;
+        }
         CipherManager cipherManager = null;
         try {
             String realname = Utils.md5(name);

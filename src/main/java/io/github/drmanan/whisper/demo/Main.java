@@ -12,46 +12,33 @@
 
 package io.github.drmanan.whisper.demo;
 
+import com.esotericsoftware.minlog.Log;
 import io.github.drmanan.whisper.WhisperDb;
 import io.github.drmanan.whisper.WhisperFactory;
 import io.github.drmanan.whisper.WhisperHash;
-import io.github.drmanan.whisper.collision.Hash;
 import io.github.drmanan.whisper.demo.pojo.User;
 
-import java.security.Provider;
-import java.security.Security;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.logging.Logger;
 
 public class Main {
+
+//    static Logger log = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
+
         var path = "C:\\Users\\manan\\";
+//        path = "D:\\";
         path = path.concat(".whisper");
+
+        Log.info(path);
 
         String databaseName = "testDb";
         String password = "passw0rd";
 
-        List<String> algorithms = Arrays.stream(Security.getProviders())
-                .flatMap(provider -> provider.getServices().stream())
-                .filter(service -> "Cipher".equals(service.getType()))
-                .map(Provider.Service::getAlgorithm)
-                .collect(Collectors.toList());
+        Log.info( "main: Db: "+databaseName);
+        Log.info( "main: Password: "+password);
 
-        for (String s: algorithms) {
-            System.out.println(s);
-        }
-
-        System.out.println("\n\nProviders' services\n");
-
-        for (Provider provider : Security.getProviders()) {
-            for (Provider.Service service : provider.getServices()) {
-                String algorithm = service.getAlgorithm();
-                System.out.println(algorithm);
-            }
-        }
-
-       /* WhisperDb db = WhisperFactory.openOrCreateDatabase(path,databaseName,password);
+        WhisperDb db = WhisperFactory.openOrCreateDatabase(path, databaseName, password);
 
         User user = new User();
         user.setUsername("User1");
@@ -63,7 +50,6 @@ public class Main {
 
         users.put(user.getUsername(), user);
 
-        System.out.println("Key: "+user.getUsername()+" Value: "+ users.get(user.getUsername()).toString());
-*/
+        Log.info("Key: " + user.getUsername() + " Value: " + users.get(user.getUsername()).toString());
     }
 }

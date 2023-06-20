@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"io.github.drmanan.whisper.util"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"io.github.drmanan.whisper"},{"l":"io.github.drmanan.whisper.collision"},{"l":"io.github.drmanan.whisper.demo"},{"l":"io.github.drmanan.whisper.demo.pojo"},{"l":"io.github.drmanan.whisper.exceptions"},{"l":"io.github.drmanan.whisper.util"}];updateSearchResults();

@@ -8,6 +8,7 @@
 
 package io.github.drmanan.whisper.util;
 
+import com.esotericsoftware.minlog.Log;
 import io.github.drmanan.whisper.collision.CipherManager;
 
 import javax.crypto.SecretKeyFactory;
@@ -47,8 +48,7 @@ public class Utils {
      *
      * @param s String to be hashed
      * @return Hashed string
-     * @throws NoSuchAlgorithmException
-     * Thrown if MD5 algorithm instance is not found in message digest.
+     * @throws NoSuchAlgorithmException Thrown if MD5 algorithm instance is not found in message digest.
      */
     public static String md5(String s) throws NoSuchAlgorithmException {
         MessageDigest digest;
@@ -61,28 +61,24 @@ public class Utils {
         return toHexString(result);
     }
 
-   /**
-    * recursiveDelete
-    * <p>
-    * >> Commons-io or jdk.jpackage.internal.IOUtils or my own, to reduce the size and remove commons-io
-    * <br>
-    * >> jdk.jpackage.internal.IOUtils.deleteRecursive returns void, may need acknowledgement of deletion
-    * </p>
-    *
-    * @param path path of <b>file and/or directory</b> to be <b><i>Deleted, recursively</i></b>
-    *
-    * @return boolean True on successful deletion
-    *
-    * @throws FileNotFoundException
-    * Throws FileNotFound if the path is incorrect.
-    *
-    */
+    /**
+     * recursiveDelete
+     * <p>
+     * >> Commons-io or jdk.jpackage.internal.IOUtils or my own, to reduce the size and remove commons-io
+     * <br>
+     * >> jdk.jpackage.internal.IOUtils.deleteRecursive returns void, may need acknowledgement of deletion
+     * </p>
+     *
+     * @param path path of <b>file and/or directory</b> to be <b><i>Deleted, recursively</i></b>
+     * @return boolean True on successful deletion
+     * @throws FileNotFoundException Throws FileNotFound if the path is incorrect.
+     */
 
-   public static boolean recursiveDelete(File path) throws FileNotFoundException {
+    public static boolean recursiveDelete(File path) throws FileNotFoundException {
         if (!path.exists()) throw new FileNotFoundException(path.getAbsolutePath());
         boolean ret = true;
-        if (path.isDirectory()){
-            for (File f : path.listFiles()){
+        if (path.isDirectory()) {
+            for (File f : path.listFiles()) {
                 ret = ret && recursiveDelete(f);
             }
         }
@@ -94,9 +90,12 @@ public class Utils {
 //			Security.addProvider(new BouncyCastleProvider());
 //            for(String s : Security.getAlgorithms("Cipher"))
 //                 System.out.println(s);
+            Log.info("Utils: checkForCryptoAvailable");
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CipherManager.key_algorithm);
+            Log.info("Utils: checkForCryptoAvailable: Algo Available, Algo is: " + CipherManager.key_algorithm);
             return true;
         } catch (NoSuchAlgorithmException e) {
+            Log.info("Utils: checkForCryptoAvailable: Not Available");
             return false;
         }
     }
