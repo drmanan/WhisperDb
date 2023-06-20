@@ -1,5 +1,6 @@
 package io.github.drmanan.whisper;
 
+import com.esotericsoftware.minlog.Log;
 import io.github.drmanan.whisper.collision.CipherManager;
 import io.github.drmanan.whisper.util.Utils;
 
@@ -20,6 +21,9 @@ public class WhisperDb {
     }
 
     public WhisperHash openOrCreateHash(String hashName) {
+
+        Log.info("WhisperDb: openOrCreateHash");
+
         WhisperHash hash;
         try {
             if (existsHash(hashName)) {

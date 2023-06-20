@@ -10,6 +10,8 @@
 
 package io.github.drmanan.whisper.util;
 
+import java.util.Arrays;
+
 public class Salt {
     private byte[] salt;
 
@@ -22,5 +24,12 @@ public class Salt {
 
     public byte[] getSalt() {
         return salt;
+    }
+
+    @Override
+    public String toString() {
+        return "Salt{" +
+                "salt=" + Arrays.toString(salt) +
+                '}';
     }
 }

@@ -87,9 +87,6 @@ public class Utils {
 
     public static boolean checkForCryptoAvailable() {
         try {
-//			Security.addProvider(new BouncyCastleProvider());
-//            for(String s : Security.getAlgorithms("Cipher"))
-//                 System.out.println(s);
             Log.info("Utils: checkForCryptoAvailable");
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CipherManager.key_algorithm);
             Log.info("Utils: checkForCryptoAvailable: Algo Available, Algo is: " + CipherManager.key_algorithm);

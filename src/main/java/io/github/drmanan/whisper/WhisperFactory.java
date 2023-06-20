@@ -13,6 +13,14 @@ public class WhisperFactory {
     private static final String DB_NAME = "data.db";
     private static final String SALT_NAME = "salt";
 
+    /**
+     * Open/create a Db instance.
+     *
+     * @param path     the path for the database folder - use Context.getFilesDir().getPath()
+     * @param name     name of the database
+     * @param password password - set as null if you don't need encryption / for better performances
+     * @return Database instance
+     */
     public static WhisperDb openOrCreateDatabase(String path, String name, String password) {
         Log.info("WhisperFactory: openOrCreateDatabase");
         if (WhisperFactory.existsDatabase(path, name)) {
@@ -24,6 +32,18 @@ public class WhisperFactory {
         }
     }
 
+    /**
+     * Open/create a Db instance.
+     *
+     * <p>The operation requires some time, according to device CPU power.</p>
+     *
+     * @param path     the path for the database folder - use Context.getFilesDir().getPath()
+     * @param name     name of the database
+     * @param password password - set as null if you don't need encryption / for better performances
+     * @param listener a WaspListener instance, to get the database when is ready
+     * @return Database instance
+     * @implNote Will Move to an async approach.
+     */
     public static WhisperDb openOrCreateDatabase(final String path, final String name, final String password, final WhisperListener<WhisperDb> listener) {
         WhisperDb db;
         if (WhisperFactory.existsDatabase(path, name)) {
@@ -42,19 +62,29 @@ public class WhisperFactory {
     }
 
     protected static WhisperDb createDatabase(final String path, final String name, final String password) {
-        if (password != null && !Utils.checkForCryptoAvailable()) return null;
+        Log.debug("WhisperFactory: CreateDb");
+        if (password != null && !Utils.checkForCryptoAvailable()) {
+            Log.debug("WhisperFactory: password: " + password);
+            return null;
+        }
         Salt salt = Utils.generateSalt();
+        Log.debug("WhisperFactory: Salt generated: " + salt);
         WhisperDb db = new WhisperDb();
+        Log.debug("WhisperFactory: New Db");
         db.setName(name);
         db.setPath(path);
+        Log.debug("WhisperFactory: Db Name: " + name);
+        Log.debug("WhisperFactory: Db Path: " + path);
         try {
             CipherManager cipherManager = null;
             if (!Utils.isEmpty(password)) {
+                Log.debug("WhisperFactory: Password is provided, setting cipherManager");
                 cipherManager = CipherManager.getInstance(password.toCharArray(), salt.getSalt());
             }
 
             if (storeDatabase(db, cipherManager)) {
-                KryoStoreUtils.serializeToDisk(salt, db.getPath() + "/" + db.getName() + "/" + SALT_NAME, null);
+                Log.debug("WhisperFactory: Storing Db");
+                KryoStoreUtils.serializeToDisk(salt, db.getPath() + "\\" + db.getName() + "\\" + SALT_NAME, null);
                 db.setCipherManager(cipherManager);
                 return db;
             } else return null;
@@ -65,22 +95,24 @@ public class WhisperFactory {
     }
 
     protected static boolean existsDatabase(String path, String name) {
+        Log.info("WhisperFactory: existsDatabase");
         try {
             WhisperDb db = new WhisperDb();
             db.setPath(path);
             db.setName(name);
             String directory;
-            directory = db.getPath() + "/" + db.getName();
-
+            directory = db.getPath() + "\\" + db.getName();
+            Log.info("WhisperFactory: existsDatabase: trying if Db Exists at " + directory);
             return (new File(directory).exists());
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
 
     public static boolean destroyDatabase(WhisperDb db) {
         try {
-            String directory = db.getPath() + "/" + Utils.md5(db.getName()) + "/";
+            String directory = db.getPath() + "\\" + Utils.md5(db.getName()) + "\\";
             if (new File(directory).exists()) { // if exists
                 // delete recursively
                 try {
@@ -100,13 +132,13 @@ public class WhisperFactory {
 
     protected static boolean storeDatabase(WhisperDb db, CipherManager cipherManager) {
         try {
-            String directory = db.getPath() + "/" + db.getName();
+            String directory = db.getPath() + "\\" + db.getName();
             boolean success = true;
             if (!(new File(directory).exists())) success = (new File(directory)).mkdir();
             if (success) {
                 // do not store the cipherManager
                 db.clearCipherInformation();
-                KryoStoreUtils.serializeToDisk(db, db.getPath() + "/" + db.getName() + "/" + DB_NAME, cipherManager);
+                KryoStoreUtils.serializeToDisk(db, db.getPath() + "\\" + db.getName() + "\\" + DB_NAME, cipherManager);
                 db.setCipherManager(cipherManager);
 
                 return true;
