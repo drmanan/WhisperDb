@@ -22,15 +22,27 @@ public class WhisperFactory {
      * @param name     name of the database
      * @param password password - set as null if you don't need encryption / for better performances
      * @return Database instance
+     *
+     * @deprecated Please use listener. Operate on database after listener.onDone()
+     *
      */
+    @Deprecated
     public static WhisperDb openOrCreateDatabase(String path, String name, String password) {
-        Log.info(getLineNumber() + "WhisperFactory: openOrCreateDatabase");
+        // TODO Temp var for debug
+        WhisperDb db;
+        Log.info(getLineNumber() + " WhisperFactory: openOrCreateDatabase");
         if (WhisperFactory.existsDatabase(path, name)) {
-            Log.info(getLineNumber() + "WhisperFactory: Db Exists");
-            return WhisperFactory.loadDatabase(path, name, password);
+            Log.info(getLineNumber() + " WhisperFactory: Db Exists");
+            db = WhisperFactory.loadDatabase(path, name, password);
+            return db;
         } else {
-            Log.info(getLineNumber() + "WhisperFactory: Create new Db");
-            return WhisperFactory.createDatabase(path, name, password);
+            Log.info(getLineNumber() + " WhisperFactory: Create new Db with ");
+            Log.info(getLineNumber() + " WhisperFactory: Path " + path);
+            Log.info(getLineNumber() + " WhisperFactory: Name " + name);
+            Log.info(getLineNumber() + " WhisperFactory: Password " + password);
+            db = WhisperFactory.createDatabase(path, name, password);
+            Log.info(getLineNumber() + " WhisperFactory: Created new Db as " + db);
+            return db;
         }
     }
 
@@ -63,29 +75,29 @@ public class WhisperFactory {
         return db;
     }
 
-    protected static WhisperDb createDatabase(final String path, final String name, final String password) {
-        Log.debug("WhisperFactory: CreateDb");
+    protected static WhisperDb createDatabase(final String path, final String dbName, final String password) {
+        Log.debug(getLineNumber() + " WhisperFactory: CreateDb");
         if (password != null && !Utils.checkForCryptoAvailable()) {
-            Log.debug(getLineNumber() + "WhisperFactory: password: " + password);
+            Log.debug(getLineNumber() + " WhisperFactory: password: " + password);
             return null;
         }
         Salt salt = Utils.generateSalt();
-        Log.debug("WhisperFactory: Salt generated: " + salt);
+        Log.debug(getLineNumber() + " WhisperFactory: Salt generated: " + salt);
         WhisperDb db = new WhisperDb();
-        Log.debug("WhisperFactory: New Db");
-        db.setName(name);
+        Log.debug(getLineNumber() + " WhisperFactory: New Db");
+        db.setName(dbName);
         db.setPath(path);
-        Log.debug("WhisperFactory: Db Name: " + name);
-        Log.debug("WhisperFactory: Db Path: " + path);
+        Log.debug(getLineNumber() + " WhisperFactory: Db Name: " + dbName);
+        Log.debug(getLineNumber() + " WhisperFactory: Db Path: " + path);
         try {
             CipherManager cipherManager = null;
             if (!Utils.isEmpty(password)) {
-                Log.debug("WhisperFactory: Password is provided, setting cipherManager");
+                Log.debug(getLineNumber() + " WhisperFactory: Password is provided, setting cipherManager");
                 cipherManager = CipherManager.getInstance(password.toCharArray(), salt.getSalt());
             }
 
             if (storeDatabase(db, cipherManager)) {
-                Log.debug("WhisperFactory: Storing Db");
+                Log.debug(getLineNumber() + " WhisperFactory: Storing Db - Serialising");
                 KryoStoreUtils.serializeToDisk(salt, db.getPath() + "\\" + db.getName() + "\\" + SALT_NAME, null);
                 db.setCipherManager(cipherManager);
                 return db;
@@ -97,18 +109,19 @@ public class WhisperFactory {
     }
 
     protected static boolean existsDatabase(String path, String name) {
-        Log.info(getLineNumber() + "WhisperFactory: existsDatabase");
+        Log.info(getLineNumber() + " WhisperFactory: existsDatabase");
         try {
             WhisperDb db = new WhisperDb();
             db.setPath(path);
             db.setName(name);
             String directory;
             directory = db.getPath() + "\\" + db.getName();
-            Log.info(getLineNumber() + "WhisperFactory: existsDatabase: trying if Db Exists at " + directory);
+            Log.info(getLineNumber() + " WhisperFactory: existsDatabase: trying if Db Exists at " + directory);
             boolean doesFileExist = new File(directory).exists();
-            Log.info(getLineNumber() + "WhisperFactory: existsDatabase: doesFileExist: " + doesFileExist);
+            Log.info(getLineNumber() + " WhisperFactory: existsDatabase: doesFileExist: " + doesFileExist);
             return doesFileExist;
         } catch (Exception e) {
+            Log.info(getLineNumber() + " WhisperFactory: existsDatabase: Error " + e.getMessage());
             e.printStackTrace();
             return false;
         }

@@ -13,7 +13,7 @@
 package io.github.drmanan.whisper;
 
 public abstract class WhisperListener<T> {
-    abstract public void onDone(T ret);
+    abstract public void onDone(T databaseInstance);
 
     public void onError(String error) {
         System.out.println("DB Error" + error);

@@ -17,6 +17,8 @@ import java.io.FileNotFoundException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -99,5 +101,15 @@ public class Utils {
 
     public static int getLineNumber() {
         return Thread.currentThread().getStackTrace()[2].getLineNumber();
+    }
+
+    public static boolean isNumbers(String str) {
+        String regex = "[0-9]+";
+        Pattern p = Pattern.compile(regex);
+        if (str == null) {
+            return false;
+        }
+        Matcher m = p.matcher(str);
+        return m.matches();
     }
 }

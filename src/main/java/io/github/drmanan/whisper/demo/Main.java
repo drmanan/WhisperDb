@@ -16,6 +16,7 @@ import com.esotericsoftware.minlog.Log;
 import io.github.drmanan.whisper.WhisperDb;
 import io.github.drmanan.whisper.WhisperFactory;
 import io.github.drmanan.whisper.WhisperHash;
+import io.github.drmanan.whisper.WhisperListener;
 import io.github.drmanan.whisper.demo.pojo.User;
 
 import static io.github.drmanan.whisper.util.Utils.getLineNumber;
@@ -23,6 +24,8 @@ import static io.github.drmanan.whisper.util.Utils.getLineNumber;
 public class Main {
 
     // static Logger log = Logger.getLogger(Main.class.getName());
+
+    static WhisperDb db;
 
     public static void main(String[] args) {
 
@@ -38,29 +41,71 @@ public class Main {
         Log.info(getLineNumber() + " main: Db: " + databaseName);
         Log.info(getLineNumber() + " main: Password: " + password);
 
-        WhisperDb db = WhisperFactory.openOrCreateDatabase(path, databaseName, password);
+        WhisperFactory.openOrCreateDatabase(path, databaseName, password, new WhisperListener<WhisperDb>() {
+            @Override
+            public void onDone(WhisperDb whisperDb) {
 
-        Log.debug("main: Is db available?");
+                Log.info("main: WhisperListener: onDone");
 
-        User user = new User();
-        user.setUsername("User1");
-        user.setEmail("user1@example.com");
-        user.setTelephone("+91-9999555511");
-        user.setAddress("No Address");
+                db = whisperDb;
 
-        Log.debug("main: User: " + user);
+                User user = new User();
+                user.setUsername("User1");
+                user.setEmail("user1@example.com");
+                user.setTelephone("+91-9999555511");
+                user.setAddress("No Address");
 
-        if (db == null) {
-            Log.debug("main: Db is null");
-        } else {
-            Log.debug("main: Db is not null");
-            Log.debug("main: Db is " + db);
-        }
+                Log.debug("main: WhisperListener: onDone: User: " + user);
 
-        WhisperHash users = db.openOrCreateHash("Users");
+                if (db == null) {
+                    Log.info("main: WhisperListener: onDone: Db is null");
+                } else {
+                    Log.info("main: WhisperListener: onDone: Db is not null");
+                    Log.info("main: WhisperListener: onDone: Db is " + db);
+                }
+                WhisperHash users = db.openOrCreateHash("Users");
 
-        users.put(user.getUsername(), user);
+                users.put(user.getUsername(), user);
 
-        Log.info("Key: " + user.getUsername() + " Value: " + users.get(user.getUsername()).toString());
+                Log.info("Key: " + user.getUsername() + " Value: " + users.get(user.getUsername()).toString());
+            }
+        });
+
+        /*
+        WhisperDb db = WhisperFactory.openOrCreateDatabase(path, databaseName, password, new WhisperListener<WhisperDb>() {
+            @Override
+            public void onDone(WhisperDb ret) {
+                User user = new User();
+                user.setUsername("User1");
+                user.setEmail("user1@example.com");
+                user.setTelephone("+91-9999555511");
+                user.setAddress("No Address");
+
+                Log.debug("main: User: " + user);
+
+                if (db == null) {
+                    Log.debug("main: Db is null");
+                } else {
+                    Log.debug("main: Db is not null");
+                    Log.debug("main: Db is " + db);
+                }
+
+                try {
+                    Thread.sleep(1000);
+                    Log.debug("main: After sleep");
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                WhisperHash users = db.openOrCreateHash("Users");
+
+                users.put(user.getUsername(), user);
+
+                Log.info("Key: " + user.getUsername() + " Value: " + users.get(user.getUsername()).toString());
+            }
+        });
+        */
+
+        Log.info("main: Is db available?");
     }
 }

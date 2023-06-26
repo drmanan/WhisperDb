@@ -12,6 +12,9 @@
 
 package io.github.drmanan.whisper.demo.pojo;
 
+import com.esotericsoftware.minlog.Log;
+import io.github.drmanan.whisper.util.Utils;
+
 public class User {
     private String username;
     private String email;
@@ -49,6 +52,9 @@ public class User {
     }
 
     public void setTelephone(String telephone) {
+        if (!Utils.isNumbers(telephone)){
+            Log.info("CAUTION: User: setTelephone: Telephone number in NaN, LoL");
+        }
         this.telephone = telephone;
     }
 
