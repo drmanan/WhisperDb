@@ -12,18 +12,16 @@
 
 package io.github.drmanan.whisper.demo;
 
-import com.esotericsoftware.minlog.Log;
 import io.github.drmanan.whisper.WhisperDb;
 import io.github.drmanan.whisper.WhisperFactory;
 import io.github.drmanan.whisper.WhisperHash;
 import io.github.drmanan.whisper.WhisperListener;
 import io.github.drmanan.whisper.demo.pojo.User;
+import io.github.drmanan.whisper.util.log.Log;
 
 import static io.github.drmanan.whisper.util.Utils.getLineNumber;
 
 public class Main {
-
-    // static Logger log = Logger.getLogger(Main.class.getName());
 
     static WhisperDb db;
 
@@ -106,6 +104,6 @@ public class Main {
         });
         */
 
-        Log.info("main: Is db available?");
+        Log.criticalInfo("main: Is db available? " + db);
     }
 }

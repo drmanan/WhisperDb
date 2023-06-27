@@ -58,7 +58,6 @@ public abstract class Thread implements Runnable {
         synchronized (listeners) {
             for (ThreadListener listener : listeners) {
                 listener.threadComplete(this);
-
             }
         }
     }
