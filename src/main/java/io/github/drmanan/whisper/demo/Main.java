@@ -23,7 +23,7 @@ import static io.github.drmanan.whisper.util.Utils.getLineNumber;
 
 public class Main {
 
-    static WhisperDb db;
+    // static WhisperDb db;
 
     public static void main(String[] args) {
 
@@ -39,7 +39,7 @@ public class Main {
         Log.info(getLineNumber() + " main: Db: " + databaseName);
         Log.info(getLineNumber() + " main: Password: " + password);
 
-        WhisperFactory.openOrCreateDatabase(path, databaseName, password, new WhisperListener<WhisperDb>() {
+        /*WhisperFactory.openOrCreateDatabase(path, databaseName, password, new WhisperListener<WhisperDb>() {
             @Override
             public void onDone(WhisperDb whisperDb) {
 
@@ -67,7 +67,7 @@ public class Main {
 
                 Log.info("Key: " + user.getUsername() + " Value: " + users.get(user.getUsername()).toString());
             }
-        });
+        });*/
 
         /*
         WhisperDb db = WhisperFactory.openOrCreateDatabase(path, databaseName, password, new WhisperListener<WhisperDb>() {
@@ -97,13 +97,13 @@ public class Main {
 
                 WhisperHash users = db.openOrCreateHash("Users");
 
-                users.put(user.getUsername(), user);
+                users.put(user.getUsername(/), user);
 
                 Log.info("Key: " + user.getUsername() + " Value: " + users.get(user.getUsername()).toString());
             }
         });
         */
 
-        Log.criticalInfo("main: Is db available? " + db);
+        // Log.criticalInfo("main: Is db available? " + db);
     }
 }

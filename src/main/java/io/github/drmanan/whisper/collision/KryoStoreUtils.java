@@ -16,7 +16,7 @@ package io.github.drmanan.whisper.collision;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.minlog.Log;
+import io.github.drmanan.whisper.util.log.Log;
 
 import javax.crypto.Cipher;
 import java.io.File;
@@ -49,7 +49,7 @@ public class KryoStoreUtils {
             getKryoInstance().writeObject(output, dataPage);
             output.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e.getMessage());
             throw new Exception("\nERROR on serializeToDisk:" + e.getMessage());
         }
     }

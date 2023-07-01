@@ -8,6 +8,8 @@
 
 package io.github.drmanan.whisper.collision;
 
+import io.github.drmanan.whisper.util.log.Log;
+
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -34,6 +36,7 @@ public class CipherManager {
     protected static CipherManager instance = null;
 
     private CipherManager() {
+
     }
 
     public static CipherManager getInstance(char[] p, byte[] s) {
@@ -42,7 +45,7 @@ public class CipherManager {
             try {
                 instance.generateSK(p, s);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.error(e.getMessage());
                 return null;
             }
         }
@@ -68,7 +71,7 @@ public class CipherManager {
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return cipher;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e.getMessage());
             return null;
         }
     }
@@ -80,7 +83,7 @@ public class CipherManager {
             cipher.init(Cipher.DECRYPT_MODE, key, ivParams);
             return cipher;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.error(e.getMessage());
             return null;
         }
     }
